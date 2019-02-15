@@ -14,3 +14,6 @@ def test_redistribute():
 
 def test_part_one():
     assert s.part_one([0,2,7,0]) == 5
+
+def test_part_two():
+    assert s.part_two([0,2,7,0]) == 4

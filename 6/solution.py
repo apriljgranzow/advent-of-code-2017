@@ -28,10 +28,27 @@ def part_one(intList):
             return loops
         else:
             configurations.add(str(new_list))
-            
+
+def part_two(intList):
+    new_list = intList[:]
+    configurations = set() # can't hash lists so we will cast to string
+    loops = 0
+    repeated_configuration = None
+    while True:
+        loops += 1
+        new_list = redistribute(new_list)
+        if str(new_list) == repeated_configuration:
+            return loops
+        elif str(new_list) in configurations:
+            repeated_configuration = str(new_list)
+            loops = 0
+            configurations = set()
+        else:
+            configurations.add(str(new_list))
 
 if __name__ == "__main__":
     with open("input.txt") as file:
         text = file.read()
     array = [int(x) for x in text.split()]
     print(part_one(array))
+    print(part_two(array))
