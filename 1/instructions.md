@@ -21,8 +21,6 @@ For example:
 
 *What is the solution* to your captcha?
 
-Your puzzle answer was `1228`.
-
 ## --- Part Two ---
 
 You notice a progress bar that jumps to 50% completion. Apparently, the door isn't yet satisfied, but it did emit a *star* as encouragement. The instructions change:
@@ -38,5 +36,3 @@ For example:
 - `12131415` produces `4`.
 
 *What is the solution* to your new captcha?
-
-Your puzzle answer was `1238`.
