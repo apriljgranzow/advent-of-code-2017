@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict, Counter
 
 def parse_input(text):
     grammar = re.compile(r'(\w+) \((\d+)\) ?-?>? ?(.+)?')
@@ -62,22 +63,6 @@ class Node(object):
         '''Only works on direct children, not entire subtrees'''
         return len(set([x.weight for x in self.children])) == 1
 
-    def tree_weight(self):
-        # https://www.geeksforgeeks.org/iterative-preorder-traversal-of-a-n-ary-tree/
-        '''Return sum of node weights for the entire tree'''
-        total = 0
-        stack = []
-        stack.append(self)
-        total += self.weight
-        while len(stack) > 0:
-            current_node = stack[len(stack)-1]
-            if current_node.children:
-                stack.extend(current_node.children)
-            else:
-                total += stack.pop().weight
-        self.total_weight = total
-        return total
-
 def node_children(parent,inputs):
     '''Given a node name, return a list of node objects representing its
     children'''
@@ -106,26 +91,73 @@ def build_tree(inputs):
             stack.pop()
     return root
 
+def tree_weight(root):
+    # https://www.geeksforgeeks.org/iterative-preorder-traversal-of-a-n-ary-tree/
+    # FIX THIS
+    '''Given a parent node, find the sum of its weight and every node
+    governed by it.'''
+    total = 0
+    stack = []
+    stack.append(root)
+    seen = {root}
+    if not root.children:
+        return root.weight
+    while len(stack) > 0:
+        current_node = stack[len(stack)-1]
+        if current_node.children:
+            total += current_node.weight
+            stack.pop()
+            stack.extend([x for x in current_node.children if x not in seen])
+            seen.update(current_node.children)
+        else:
+            total += current_node.weight
+            stack.pop()
+    return total
+
+def find_unbalanced_node(tree):
+    '''For a tree to be considered balanced, every subtree underneath it 
+    must have the same total weight. Leaves of the same parent must have
+    the exact same values.'''
+    pass
+#     current_node = tree
+#     off_value = None
+#     while current_node.children:
+#         child_weights = defaultdict(set)
+#         for child in current_node.children:
+#             child_weights[tree_weight(child)].add(child)
+#         weight_counts = Counter([tree_weight(x) for x in current_node.children])
+#         if 1 in weight_counts.values():
+#             off_value = 
+        
+
+def part_two(inputs):
+    '''Given that exactly one node is the wrong weight, what would its 
+    weight need to be to balance the entire tree?'''
+    tree = build_tree(inputs)
+    pass
+
+### Testing Data ###
 example = '''
-                pbga (66)
-                xhth (57)
-                ebii (61)
-                havc (66)
-                ktlj (57)
-                fwft (72) -> ktlj, cntj, xhth
-                qoyq (66)
-                padx (45) -> pbga, havc, qoyq
-                tknk (41) -> ugml, padx, fwft
-                jptl (61)
-                ugml (68) -> gyxo, ebii, jptl
-                gyxo (61)
-                cntj (57)
-            '''
+        pbga (66)
+        xhth (57)
+        ebii (61)
+        havc (66)
+        ktlj (57)
+        fwft (72) -> ktlj, cntj, xhth
+        qoyq (66)
+        padx (45) -> pbga, havc, qoyq
+        tknk (41) -> ugml, padx, fwft
+        jptl (61)
+        ugml (68) -> gyxo, ebii, jptl
+        gyxo (61)
+        cntj (57)
+'''
 inputs = create_input_list(example)
+tree = build_tree(inputs)
 
 if __name__ == "__main__":
     with open("input.txt") as file:
         text = file.read()
-    inputs = create_input_list(inputs)
+    inputs = create_input_list(text)
     print(part_one(inputs))
     
