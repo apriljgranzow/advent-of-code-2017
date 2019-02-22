@@ -51,26 +51,26 @@ def part_one(inputs):
 # https://gist.github.com/hrldcpr/2012250
 class Node(object):
     
-    def __init__(self,name,weight,children=[]):
+    def __init__(self,name,weight,parent=None,children=[]):
         '''Tree representation with arbitrary number of children stored 
         in a list'''
         self.name   = name
         self.weight = weight
         self.children = children
-        self.total_weight = weight # to cache subtree weights for the final result
+        self.parent = parent
 
     def balanced_children(self):
         '''Only works on direct children, not entire subtrees'''
         return len(set([x.weight for x in self.children])) == 1
 
-def node_children(parent,inputs):
+def node_children(parent_node,inputs):
     '''Given a node name, return a list of node objects representing its
     children'''
-    children = parent_to_child_dict(inputs)[parent][1]
+    children = parent_to_child_dict(inputs)[parent_node.name][1]
     if children == ['']:
         return []
     weights = weight_dict(inputs)
-    return [Node(x,weights[x]) for x in children]
+    return [Node(x,weights[x],parent=parent_node) for x in children]
 
 def build_tree(inputs):
     '''Build a tree structure given only a list of inputs'''
@@ -78,13 +78,14 @@ def build_tree(inputs):
     parent_to_children = parent_to_child_dict(inputs)
     weights = weight_dict(inputs)
     # Create nodes
-    root = Node(name,weights[name],node_children(name,inputs))
+    root = Node(name,weights[name])
+    root.children = node_children(root,inputs)
     stack = []
     stack.append(root)
     while len(stack) > 0:
         current_node = stack[len(stack)-1]
         if parent_to_children[current_node.name][1]:
-            current_node.children = node_children(current_node.name,inputs)
+            current_node.children = node_children(current_node,inputs)
             stack.pop()
             stack.extend(current_node.children)
         else:
@@ -124,7 +125,6 @@ def odd_value_out(node_list):
         return subtree_weights[off_node].pop()
     else:
         return None
-    
 
 def find_unbalanced_node(tree):
     '''For a tree to be considered balanced, every subtree underneath it 
@@ -141,36 +141,38 @@ def find_unbalanced_node(tree):
     # values must be the unbalanced one.
     return current_node
 
-        
-
 def part_two(inputs):
     '''Given that exactly one node is the wrong weight, what would its 
     weight need to be to balance the entire tree?'''
     tree = build_tree(inputs)
-    pass
+    off_node = find_unbalanced_node(tree)
+    values = set(tree_weight(x) for x in off_node.parent.children)
+    other_value = [x for x in values if x != tree_weight(off_node)][0]
+    return other_value - sum([tree_weight(x) for x in off_node.children])
 
 ### Testing Data ###
-example = '''
-        pbga (66)
-        xhth (57)
-        ebii (61)
-        havc (66)
-        ktlj (57)
-        fwft (72) -> ktlj, cntj, xhth
-        qoyq (66)
-        padx (45) -> pbga, havc, qoyq
-        tknk (41) -> ugml, padx, fwft
-        jptl (61)
-        ugml (68) -> gyxo, ebii, jptl
-        gyxo (61)
-        cntj (57)
-'''
-inputs = create_input_list(example)
-tree = build_tree(inputs)
+# example = '''
+#         pbga (66)
+#         xhth (57)
+#         ebii (61)
+#         havc (66)
+#         ktlj (57)
+#         fwft (72) -> ktlj, cntj, xhth
+#         qoyq (66)
+#         padx (45) -> pbga, havc, qoyq
+#         tknk (41) -> ugml, padx, fwft
+#         jptl (61)
+#         ugml (68) -> gyxo, ebii, jptl
+#         gyxo (61)
+#         cntj (57)
+# '''
+# inputs = create_input_list(example)
+# tree = build_tree(inputs)
 
 if __name__ == "__main__":
     with open("input.txt") as file:
         text = file.read()
     inputs = create_input_list(text)
     print(part_one(inputs))
+    print(part_two(inputs))
     
