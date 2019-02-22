@@ -94,7 +94,6 @@ def build_tree(inputs):
 
 def tree_weight(root):
     # https://www.geeksforgeeks.org/iterative-preorder-traversal-of-a-n-ary-tree/
-    # FIX THIS
     '''Given a parent node, find the sum of its weight and every node
     governed by it.'''
     total = 0
