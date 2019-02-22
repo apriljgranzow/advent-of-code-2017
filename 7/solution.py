@@ -114,20 +114,33 @@ def tree_weight(root):
             stack.pop()
     return total
 
+def odd_value_out(node_list):
+    subtree_weights = defaultdict(set)
+    for node in node_list:
+        subtree_weights[tree_weight(node)].add(node)
+    weight_counts = Counter([tree_weight(x) for x in node_list])
+    if 1 in weight_counts.values():
+        off_node = [k for k,v in weight_counts.items() if v == 1][0]
+        return subtree_weights[off_node].pop()
+    else:
+        return None
+    
+
 def find_unbalanced_node(tree):
     '''For a tree to be considered balanced, every subtree underneath it 
     must have the same total weight. Leaves of the same parent must have
     the exact same values.'''
-    pass
-#     current_node = tree
-#     off_value = None
-#     while current_node.children:
-#         child_weights = defaultdict(set)
-#         for child in current_node.children:
-#             child_weights[tree_weight(child)].add(child)
-#         weight_counts = Counter([tree_weight(x) for x in current_node.children])
-#         if 1 in weight_counts.values():
-#             off_value = 
+    current_node = tree
+    while current_node.children:
+        # Traverse until we get to the last level before the leaves
+        if odd_value_out(current_node.children):
+            current_node = odd_value_out(current_node.children)
+        else:
+            return current_node
+    # If we get all the way down to the leaves, one of their individual
+    # values must be the unbalanced one.
+    return current_node
+
         
 
 def part_two(inputs):
