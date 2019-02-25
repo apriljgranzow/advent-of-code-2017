@@ -45,10 +45,26 @@ def part_one(text):
     inputs = get_inputs(text)
     instructions = initialize_instruction_objects(inputs)
     registers = update_registers(instructions)
-    return max(registers.values()) 
+    return max(registers.values())
+
+def part_two(text):
+    inputs = get_inputs(text)
+    instructions = initialize_instruction_objects(inputs)
+    registers = defaultdict(int)
+    max_seen = 0
+    for line in instructions:
+        valid = parse_conditional(registers[line.node2],line.condition)
+        if valid and line.incdec == 'inc':
+            registers[line.node1] += line.inst_value
+        elif valid and line.incdec == 'dec':
+            registers[line.node1] -= line.inst_value
+        if registers[line.node1] > max_seen:
+            max_seen = registers[line.node1]
+    return max_seen
 
 if __name__ == "__main__":
     with open("input.txt") as file:
         text = file.read()
     print(part_one(text))
+    print(part_two(text))
     
